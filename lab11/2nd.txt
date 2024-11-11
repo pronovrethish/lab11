@@ -1,0 +1,113 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define MAX 100
+
+// Queue implementation for BFS
+struct Queue {
+    int items[MAX];
+    int front;
+    int rear;
+};
+
+void initQueue(struct Queue* q) {
+    q->front = -1;
+    q->rear = -1;
+}
+
+bool isEmpty(struct Queue* q) {
+    return q->front == -1;
+}
+
+void enqueue(struct Queue* q, int value) {
+    if (q->rear == MAX - 1) {
+        printf("Queue is full\n");
+        return;
+    }
+    if (q->front == -1) {
+        q->front = 0;
+    }
+    q->rear++;
+    q->items[q->rear] = value;
+}
+
+int dequeue(struct Queue* q) {
+    if (isEmpty(q)) {
+        printf("Queue is empty\n");
+        return -1;
+    }
+    int item = q->items[q->front];
+    q->front++;
+    if (q->front > q->rear) {
+        q->front = q->rear = -1;
+    }
+    return item;
+}
+
+// Function to perform BFS and calculate shortest distances
+void BFS(int graph[MAX][MAX], int n, int start) {
+    bool visited[MAX] = {false};
+    int distance[MAX];
+    
+    // Initialize distances to -1 (indicating unvisited vertices)
+    for (int i = 0; i < n; i++) {
+        distance[i] = -1;
+    }
+    
+    // Queue for BFS
+    struct Queue q;
+    initQueue(&q);
+
+    // Start BFS from the source vertex
+    enqueue(&q, start);
+    visited[start] = true;
+    distance[start] = 0;  // Distance from source to itself is 0
+
+    printf("BFS Traversal Order: ");
+
+    while (!isEmpty(&q)) {
+        int currentVertex = dequeue(&q);
+        printf("%d ", currentVertex);
+
+        // Explore all adjacent vertices
+        for (int i = 0; i < n; i++) {
+            if (graph[currentVertex][i] == 1 && !visited[i]) {
+                enqueue(&q, i);
+                visited[i] = true;
+                distance[i] = distance[currentVertex] + 1;  // Update the shortest distance
+            }
+        }
+    }
+
+    // Output the shortest distances
+    printf("\nShortest distances from vertex %d:\n", start);
+    for (int i = 0; i < n; i++) {
+        printf("Vertex %d: Distance = %d\n", i, distance[i]);
+    }
+}
+
+int main() {
+    int n, start, graph[MAX][MAX];
+
+    // Input the number of vertices
+    printf("Enter the number of vertices: ");
+    scanf("%d", &n);
+
+    // Input the adjacency matrix
+    printf("Enter the adjacency matrix:\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            scanf("%d", &graph[i][j]);
+        }
+    }
+
+    // Input the starting vertex for BFS
+    printf("Enter the starting vertex: ");
+    scanf("%d", &start);
+
+    // Perform BFS
+    BFS(graph, n, start);
+
+    return 0;
+}

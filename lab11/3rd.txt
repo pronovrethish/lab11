@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX 100
+
+// Global variables
+int time = 0;  // To keep track of finishing time
+
+// DFS function
+void DFS(int graph[MAX][MAX], int n, int vertex, bool visited[], int finishTime[], bool *hasCycle, int parent[]) {
+    visited[vertex] = true;
+    time++;  // Increment time when visiting a node
+    printf("%d ", vertex);  // Print vertex as part of DFS traversal
+
+    for (int i = 0; i < n; i++) {
+        if (graph[vertex][i] == 1) {
+            if (!visited[i]) {
+                parent[i] = vertex;  // Set parent of vertex
+                DFS(graph, n, i, visited, finishTime, hasCycle, parent);
+            } else if (i != parent[vertex]) {  // If the node is visited and not a parent, there is a cycle
+                *hasCycle = true;
+            }
+        }
+    }
+
+    time++;  // Increment time when finishing a node
+    finishTime[vertex] = time;
+}
+
+// Function to perform DFS traversal and detect cycle
+void performDFS(int graph[MAX][MAX], int n, int startVertex) {
+    bool visited[MAX] = {false};
+    int finishTime[MAX] = {0};
+    int parent[MAX] = {-1};  // To store parent of each node
+    bool hasCycle = false;   // To check if the graph has a cycle
+
+    printf("DFS Traversal Order: ");
+    DFS(graph, n, startVertex, visited, finishTime, &hasCycle, parent);
+
+    printf("\n\nFinishing Times of Vertices:\n");
+    for (int i = 0; i < n; i++) {
+        printf("Vertex %d: Finish Time = %d\n", i, finishTime[i]);
+    }
+
+    if (hasCycle) {
+        printf("\nThe graph contains a cycle.\n");
+    } else {
+        printf("\nThe graph does not contain a cycle.\n");
+    }
+}
+
+int main() {
+    int n, startVertex, graph[MAX][MAX];
+
+    // Input the number of vertices
+    printf("Enter the number of vertices: ");
+    scanf("%d", &n);
+
+    // Input the adjacency matrix
+    printf("Enter the adjacency matrix:\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            scanf("%d", &graph[i][j]);
+        }
+    }
+
+    // Input the starting vertex for DFS
+    printf("Enter the starting vertex: ");
+    scanf("%d", &startVertex);
+
+    // Perform DFS
+    performDFS(graph, n, startVertex);
+
+    return 0;
+}
